@@ -8,6 +8,8 @@ using UnityEngine.Android;
 public class GPSManager : MonoBehaviour
 {
     public TMPro.TextMeshProUGUI locationLabel;
+    public bool IsReady = false;
+    public Vector2 position;
 
     // Start is called before the first frame update
     IEnumerator Start()
@@ -57,15 +59,14 @@ public class GPSManager : MonoBehaviour
             // Access granted and location value could be retrieved
             print("Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
             locationLabel.text = Input.location.lastData.latitude + " " + Input.location.lastData.longitude;
+            IsReady = true;
         }
-
-        // Stop service if there is no need to query location updates continuously
-        Input.location.Stop();
     }
 
     // Update is called once per frame
     void Update()
     {
         locationLabel.text = Input.location.lastData.latitude + " " + Input.location.lastData.longitude;
+        position = new Vector2(Input.location.lastData.latitude, Input.location.lastData.longitude);
     }
 }
