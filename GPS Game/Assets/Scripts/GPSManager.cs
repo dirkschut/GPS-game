@@ -67,6 +67,6 @@ public class GPSManager : MonoBehaviour
     void Update()
     {
         locationLabel.text = Input.location.lastData.latitude + " " + Input.location.lastData.longitude;
-        position = new Vector2(Input.location.lastData.latitude, Input.location.lastData.longitude);
+        position = new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude);
     }
 }
