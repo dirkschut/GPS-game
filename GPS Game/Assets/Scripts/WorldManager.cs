@@ -11,7 +11,7 @@ public class WorldManager : MonoBehaviour
     public GameObject player;
     public GameObject zonePrefab;
 
-    private int scalar = 1000;
+    private int scalar = 10000;
 
     private Dictionary<Vector2, ZoneData> zones = new Dictionary<Vector2, ZoneData>();
 

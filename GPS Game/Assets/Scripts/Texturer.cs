@@ -22,7 +22,13 @@ public class Texturer : MonoBehaviour
         else
         {
             print("Success....");
-            GetComponent<Renderer>().material.mainTexture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+            Texture2D texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+            Color[] pix = texture.GetPixels(0, 0, 256, 256);
+            System.Array.Reverse(pix, 0, pix.Length);
+            texture.SetPixels(0, 0, 256, 256, pix);
+            texture.Apply();
+
+            GetComponent<Renderer>().material.mainTexture = texture;
         }
             
     }
