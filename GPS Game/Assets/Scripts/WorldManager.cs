@@ -15,6 +15,8 @@ public class WorldManager : MonoBehaviour
     public const int zoomLevel = 18;
     public const int zoneSize = 10;
 
+    private Vector2 previousPosition;
+
     private Dictionary<Vector2, ZoneData> zones = new Dictionary<Vector2, ZoneData>();
 
     // Start is called before the first frame update
@@ -30,15 +32,18 @@ public class WorldManager : MonoBehaviour
         {
             Vector2 imageID = GetImageID(GPSManager.position);
 
-            Vector3 camPos = camera.transform.position;
-            camPos.x = imageID.x * zoneSize;
-            camPos.z = -1 * imageID.y * zoneSize;
-            camera.transform.position = camPos;
+            if(imageID != previousPosition)
+            {
+                Vector3 camPos = camera.transform.position;
+                camPos.x = imageID.x * zoneSize;
+                camPos.z = -1 * imageID.y * zoneSize;
+                camera.transform.position = camPos;
 
-            Vector3 playerPos = player.transform.position;
-            playerPos.x = imageID.x * zoneSize;
-            playerPos.z = -1 * imageID.y * zoneSize;
-            player.transform.position = playerPos;
+                Vector3 playerPos = player.transform.position;
+                playerPos.x = imageID.x * zoneSize;
+                playerPos.z = -1 * imageID.y * zoneSize;
+                player.transform.position = playerPos;
+            }
 
             if(!PosHasZone(GPSManager.position))
             {
@@ -47,6 +52,7 @@ public class WorldManager : MonoBehaviour
                 ZoneData zone = new ZoneData(copy, imageID);
                 zones.Add(imageID, zone);
             }
+            previousPosition = imageID;
         }
     }
 
