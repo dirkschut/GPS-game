@@ -84,6 +84,10 @@ public class WorldManager : MonoBehaviour
             FileStream file = File.Open(Application.persistentDataPath + "/gamesave.save", FileMode.Open);
             zones = (Dictionary<ZoneID, ZoneData>)bf.Deserialize(file);
             file.Close();
+            foreach (ZoneData zoneData in zones.Values)
+            {
+                zoneData.InitializeFromSave();
+            }
         }
     }
 

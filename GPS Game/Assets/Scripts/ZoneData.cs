@@ -27,6 +27,13 @@ public class ZoneData
         ApplyTexture();
     }
 
+    public void InitializeFromSave()
+    {
+        gameObject = CreateGameObject();
+        ApplyTexture();
+        ApplyGameObjectText();
+    }
+
     /// <summary>
     /// Saves the texture in the zone data to be saved.
     /// </summary>
@@ -70,22 +77,7 @@ public class ZoneData
             points++;
             lastVisit = DateTime.Now;
             nextVisit = lastVisit.AddHours(points);
-            TextMeshPro tmpNextVisit = gameObject.transform.Find("next").GetComponent<TextMeshPro>();
-
-            string nextVisitString = "";
-            if(nextVisit.Date == DateTime.Today)
-            {
-                nextVisitString = nextVisit.ToString("H:mm:ss");
-            }
-            else
-            {
-                nextVisitString = nextVisit.ToString("dd-MM");
-            }
-            tmpNextVisit.text = nextVisitString;
-
-            TextMeshPro tmpPoints = gameObject.transform.Find("points").GetComponent<TextMeshPro>();
-            tmpPoints.text = points.ToString();
-
+            ApplyGameObjectText();
         }
     }
 
@@ -115,5 +107,24 @@ public class ZoneData
         WorldManager worldManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<WorldManager>();
         Vector3 zoneLocation = new Vector3(zoneID.x * WorldManager.zoneSize, -0.05f, -1 * zoneID.y * WorldManager.zoneSize);
         return GameObject.Instantiate(worldManager.zonePrefab, zoneLocation, Quaternion.identity);
+    }
+
+    private void ApplyGameObjectText()
+    {
+        TextMeshPro tmpNextVisit = gameObject.transform.Find("next").GetComponent<TextMeshPro>();
+
+        string nextVisitString = "";
+        if (nextVisit.Date == DateTime.Today)
+        {
+            nextVisitString = nextVisit.ToString("H:mm:ss");
+        }
+        else
+        {
+            nextVisitString = nextVisit.ToString("dd-MM");
+        }
+        tmpNextVisit.text = nextVisitString;
+
+        TextMeshPro tmpPoints = gameObject.transform.Find("points").GetComponent<TextMeshPro>();
+        tmpPoints.text = points.ToString();
     }
 }
