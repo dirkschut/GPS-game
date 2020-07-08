@@ -18,6 +18,8 @@ public class WorldManager : MonoBehaviour
     public const int zoomLevel = 18;
     public const int zoneSize = 10;
 
+    private bool forceOnEnter = false;
+
     private ZoneID previousPosition;
 
     private Dictionary<ZoneID, ZoneData> zones = new Dictionary<ZoneID, ZoneData>();
@@ -26,6 +28,7 @@ public class WorldManager : MonoBehaviour
     void Start()
     {
         LoadWorld();
+        forceOnEnter = true;
     }
 
     // Update is called once per frame
@@ -40,8 +43,10 @@ public class WorldManager : MonoBehaviour
         {
             ZoneID zoneID = GetZoneID(GPSManager.position);
 
-            if (zoneID != previousPosition)
+            if (zoneID != previousPosition || forceOnEnter)
             {
+                forceOnEnter = false;
+
                 Vector3 camPos = camera.transform.position;
                 camPos.x = zoneID.x * zoneSize;
                 camPos.z = -1 * zoneID.y * zoneSize;
