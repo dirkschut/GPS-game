@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -11,14 +13,18 @@ public class ZoneData
 {
     public string texture;
     public ZoneID zoneID;
+    public DateTime lastVisit;
+    public int points;
+    public DateTime nextVisit;
 
-    private bool hasGameObject = false;
+    [NonSerialized]
+    private GameObject gameObject;
 
     public ZoneData(GameObject gameObject, ZoneID zoneID)
     {
-        //this.gameObject = gameObject;
+        this.gameObject = gameObject;
         this.zoneID = zoneID;
-        this.ApplyTexture(gameObject);
+        ApplyTexture();
     }
 
     /// <summary>
@@ -53,11 +59,33 @@ public class ZoneData
     /// </summary>
     public void OnEnter()
     {
-        if (!hasGameObject)
+        if (gameObject == null)
         {
-            GameObject gameObject = CreateGameObject();
-            ApplyTexture(gameObject);
-            hasGameObject = true;
+            gameObject = CreateGameObject();
+            ApplyTexture();
+        }
+
+        if(lastVisit <= nextVisit || lastVisit == null)
+        {
+            points++;
+            lastVisit = DateTime.Now;
+            nextVisit = lastVisit.AddHours(points);
+            TextMeshPro tmpNextVisit = gameObject.transform.Find("next").GetComponent<TextMeshPro>();
+
+            string nextVisitString = "";
+            if(nextVisit.Date == DateTime.Today)
+            {
+                nextVisitString = nextVisit.ToString("H:mm:ss");
+            }
+            else
+            {
+                nextVisitString = nextVisit.ToString("dd-MM");
+            }
+            tmpNextVisit.text = nextVisitString;
+
+            TextMeshPro tmpPoints = gameObject.transform.Find("points").GetComponent<TextMeshPro>();
+            tmpPoints.text = points.ToString();
+
         }
     }
 
@@ -65,7 +93,7 @@ public class ZoneData
     /// Get the texture and apply it to the zone game object
     /// </summary>
     /// <param name="gameObject"></param>
-    public void ApplyTexture(GameObject gameObject)
+    public void ApplyTexture()
     {
         Debug.Log("Loading Image");
         if (File.Exists(GetImagePath()))
