@@ -134,5 +134,9 @@ public class ZoneData
         {
             gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.green;
         }
+        else if(DateTime.Today == nextVisit.Date)
+        {
+            gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.yellow;
+        }
     }
 }
