@@ -65,7 +65,7 @@ public class ZoneData
             ApplyTexture();
         }
 
-        if(lastVisit <= nextVisit || lastVisit == null)
+        if(DateTime.Now <= nextVisit || lastVisit == null)
         {
             points++;
             lastVisit = DateTime.Now;
