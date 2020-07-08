@@ -127,4 +127,12 @@ public class ZoneData
         TextMeshPro tmpPoints = gameObject.transform.Find("points").GetComponent<TextMeshPro>();
         tmpPoints.text = points.ToString();
     }
+
+    public void Update()
+    {
+        if(DateTime.Now > nextVisit)
+        {
+            gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.green;
+        }
+    }
 }

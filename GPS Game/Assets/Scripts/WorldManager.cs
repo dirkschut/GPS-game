@@ -19,7 +19,6 @@ public class WorldManager : MonoBehaviour
     public const int zoneSize = 10;
 
     private ZoneID previousPosition;
-    private bool firstEntry = true;
 
     private Dictionary<ZoneID, ZoneData> zones = new Dictionary<ZoneID, ZoneData>();
 
@@ -32,6 +31,11 @@ public class WorldManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        foreach(ZoneData zoneData in zones.Values)
+        {
+            zoneData.Update();
+        }
+
         if (GPSManager.IsReady)
         {
             ZoneID zoneID = GetZoneID(GPSManager.position);
