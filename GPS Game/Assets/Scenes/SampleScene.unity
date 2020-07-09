@@ -234,7 +234,7 @@ GameObject:
   - component: {fileID: 332557977}
   - component: {fileID: 332557980}
   - component: {fileID: 332557979}
-  - component: {fileID: 332557978}
+  - component: {fileID: 332557981}
   m_Layer: 5
   m_Name: FPS
   m_TagString: Untagged
@@ -261,18 +261,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &332557978
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 332557976}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 499e358c2dd8ddd449c981e0bcc572c5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &332557979
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -392,6 +380,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 332557976}
   m_CullTransparentMesh: 0
+--- !u!114 &332557981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332557976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fbba0d5d49570048b6acc4f78b4a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &384456728
 GameObject:
   m_ObjectHideFlags: 0
