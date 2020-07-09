@@ -113,7 +113,7 @@ public class ZoneData
     {
         TextMeshPro tmpNextVisit = gameObject.transform.Find("next").GetComponent<TextMeshPro>();
 
-        string nextVisitString = "";
+        string nextVisitString;
         if (nextVisit.Date == DateTime.Today)
         {
             nextVisitString = nextVisit.ToString("H:mm:ss");
@@ -137,6 +137,10 @@ public class ZoneData
         else if(DateTime.Today == nextVisit.Date)
         {
             gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.yellow;
+        }
+        else
+        {
+            gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.red;
         }
     }
 
