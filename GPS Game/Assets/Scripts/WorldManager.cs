@@ -13,6 +13,7 @@ public class WorldManager : MonoBehaviour
     public Camera camera;
     public GameObject player;
     public GameObject zonePrefab;
+    public TMPro.TextMeshProUGUI scoreLabel;
 
     public const int scalar = 10000;
     public const int zoomLevel = 18;
@@ -66,7 +67,7 @@ public class WorldManager : MonoBehaviour
                     SaveWorld();
                 }
 
-                zones[zoneID].OnEnter();
+                EnterZone(zoneID);
             }
             previousPosition = zoneID;
         }
@@ -138,6 +139,24 @@ public class WorldManager : MonoBehaviour
         {
             zones[zoneID].SaveTexture(texture, zoneID);
         }
+    }
+
+    public int CalculateScore()
+    {
+        int score = 0;
+
+        foreach(ZoneData zoneData in zones.Values)
+        {
+            score += zoneData.points;
+        }
+
+        return score;
+    }
+
+    private void EnterZone(ZoneID zoneID)
+    {
+        zones[zoneID].OnEnter();
+        scoreLabel.text = "Score: " + CalculateScore();
     }
 
     int long2tilex(float lon, int z)
