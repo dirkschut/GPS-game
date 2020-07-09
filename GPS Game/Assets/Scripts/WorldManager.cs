@@ -15,13 +15,13 @@ public class WorldManager : MonoBehaviour
     public GameObject zonePrefab;
     public TMPro.TextMeshProUGUI scoreLabel;
 
+    private ZoneID playerZone;
+
     public const int scalar = 10000;
     public const int zoomLevel = 18;
     public const int zoneSize = 10;
 
     private bool forceOnEnter = false;
-
-    private ZoneID previousPosition;
 
     private Dictionary<ZoneID, ZoneData> zones = new Dictionary<ZoneID, ZoneData>();
 
@@ -44,19 +44,22 @@ public class WorldManager : MonoBehaviour
         {
             ZoneID zoneID = GetZoneID(GPSManager.position);
 
-            if (zoneID != previousPosition || forceOnEnter)
+            if (zoneID != playerZone || forceOnEnter)
             {
                 forceOnEnter = false;
+                playerZone = zoneID;
 
                 Vector3 camPos = camera.transform.position;
-                camPos.x = zoneID.x * zoneSize;
-                camPos.z = -1 * zoneID.y * zoneSize;
+                //camPos.x = zoneID.x * zoneSize;
+                //camPos.z = -1 * zoneID.y * zoneSize;
+                camPos.x = 0;
+                camPos.z = 0;
                 camera.transform.position = camPos;
 
-                Vector3 playerPos = player.transform.position;
-                playerPos.x = zoneID.x * zoneSize;
-                playerPos.z = -1 * zoneID.y * zoneSize;
-                player.transform.position = playerPos;
+                //Vector3 playerPos = player.transform.position;
+                //playerPos.x = zoneID.x * zoneSize;
+                //playerPos.z = -1 * zoneID.y * zoneSize;
+                //player.transform.position = playerPos;
 
                 if (!PosHasZone(GPSManager.position))
                 {
@@ -69,7 +72,6 @@ public class WorldManager : MonoBehaviour
 
                 EnterZone(zoneID);
             }
-            previousPosition = zoneID;
         }
     }
 
@@ -157,6 +159,19 @@ public class WorldManager : MonoBehaviour
     {
         zones[zoneID].OnEnter();
         scoreLabel.text = "Score: " + CalculateScore();
+        RepositionZones();
+    }
+
+    /// <summary>
+    /// Repositions the zones around the position of the player.
+    /// </summary>
+    private void RepositionZones()
+    {
+        Debug.Log("Reposition");
+        foreach (ZoneData zoneData in zones.Values)
+        {
+            zoneData.reposition(playerZone, zoneSize);
+        }
     }
 
     int long2tilex(float lon, int z)

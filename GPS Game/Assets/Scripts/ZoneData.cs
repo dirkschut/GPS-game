@@ -139,4 +139,18 @@ public class ZoneData
             gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.yellow;
         }
     }
+
+    /// <summary>
+    /// Repositions the zone relative to the player.
+    /// </summary>
+    /// <param name="playerZone">The zoneID of the zone the player occupies.</param>
+    /// <param name="zoneSize">The size of each zone.</param>
+    public void reposition(ZoneID playerZone, float zoneSize)
+    {
+        int dx = zoneID.x - playerZone.x;
+        int dy = zoneID.y - playerZone.y;
+
+        Vector3 zoneLocation = new Vector3(dx * zoneSize, -0.05f, -1 * dy * zoneSize);
+        gameObject.transform.position = zoneLocation;
+    }
 }

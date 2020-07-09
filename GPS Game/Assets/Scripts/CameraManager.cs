@@ -11,7 +11,7 @@ public class CameraManager : MonoBehaviour
     private float mouseZoomSpeed = 5f;
 
     private float minZoom = 7f;
-    private float maxZoom = 150f;
+    private float maxZoom = 170f;
 
     private Vector2 oldMousePos;
 
