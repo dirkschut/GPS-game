@@ -67,7 +67,6 @@ public class WorldManager : MonoBehaviour
                     GameObject copy = Instantiate(zonePrefab, zoneLocation, Quaternion.identity);
                     ZoneData zone = new ZoneData(copy, zoneID);
                     zones.Add(zoneID, zone);
-                    SaveWorld();
                 }
 
                 EnterZone(zoneID);
@@ -155,11 +154,16 @@ public class WorldManager : MonoBehaviour
         return score;
     }
 
+    /// <summary>
+    /// Gets called every time a player enters a zone and at game launch.
+    /// </summary>
+    /// <param name="zoneID">THe zoneID of zone the player entered.</param>
     private void EnterZone(ZoneID zoneID)
     {
         zones[zoneID].OnEnter();
         scoreLabel.text = "Score: " + CalculateScore();
         RepositionZones();
+        SaveWorld();
     }
 
     /// <summary>
