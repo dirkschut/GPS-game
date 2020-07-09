@@ -120,7 +120,7 @@ public class ZoneData
         }
         else
         {
-            nextVisitString = nextVisit.ToString("dd-MM");
+            nextVisitString = nextVisit.ToString("dd MMM");
         }
         tmpNextVisit.text = nextVisitString;
 
