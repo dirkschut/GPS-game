@@ -14,6 +14,7 @@ public class WorldManager : MonoBehaviour
     public GameObject player;
     public GameObject zonePrefab;
     public TMPro.TextMeshProUGUI scoreLabel;
+    public TMPro.TextMeshProUGUI zonesLabel;
 
     private ZoneID playerZone;
 
@@ -162,6 +163,7 @@ public class WorldManager : MonoBehaviour
     {
         zones[zoneID].OnEnter();
         scoreLabel.text = "Score: " + CalculateScore();
+        zonesLabel.text = "Zones: " + zones.Count;
         RepositionZones();
         SaveWorld();
     }
