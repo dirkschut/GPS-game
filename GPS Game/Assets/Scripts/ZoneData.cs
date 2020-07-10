@@ -148,7 +148,7 @@ public class ZoneData
         }
         else
         {
-            gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.red;
+            gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.white;
         }
     }
 
