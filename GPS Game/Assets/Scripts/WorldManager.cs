@@ -50,18 +50,6 @@ public class WorldManager : MonoBehaviour
                 forceOnEnter = false;
                 playerZone = zoneID;
 
-                Vector3 camPos = camera.transform.position;
-                //camPos.x = zoneID.x * zoneSize;
-                //camPos.z = -1 * zoneID.y * zoneSize;
-                camPos.x = 0;
-                camPos.z = 0;
-                camera.transform.position = camPos;
-
-                //Vector3 playerPos = player.transform.position;
-                //playerPos.x = zoneID.x * zoneSize;
-                //playerPos.z = -1 * zoneID.y * zoneSize;
-                //player.transform.position = playerPos;
-
                 if (!PosHasZone(GPSManager.position))
                 {
                     Vector3 zoneLocation = new Vector3(zoneID.x * zoneSize, -0.05f, -1 * zoneID.y * zoneSize);
@@ -71,6 +59,28 @@ public class WorldManager : MonoBehaviour
                 }
 
                 EnterZone(zoneID);
+            }
+            else
+            {
+                //Interpolate position in zone and move player to said position.
+                Vector2 gpsLocation = GPSManager.position;
+                Vector2 thisZoneStart = new Vector2(tilex2long(zoneID.x, zoomLevel), tiley2lat(zoneID.y, zoomLevel));
+                Vector2 nextZoneStartX = new Vector2(tilex2long(zoneID.x + 1, zoomLevel), tiley2lat(zoneID.y, zoomLevel));
+                Vector2 nextZoneStartY = new Vector2(tilex2long(zoneID.x, zoomLevel), tiley2lat(zoneID.y + 1, zoomLevel));
+                float percentageX = (gpsLocation.x - thisZoneStart.x) / (nextZoneStartX.x - thisZoneStart.x);
+                float percentageY = (gpsLocation.y - thisZoneStart.y) / (nextZoneStartY.y - thisZoneStart.y);
+                if (percentageY < 0) percentageY = 0;
+                if (percentageX < 0) percentageX = 0;
+
+                Vector3 playerPos = player.transform.position;
+                playerPos.x = percentageX * zoneSize - 0.5f * zoneSize;
+                playerPos.z = -1 * percentageY * zoneSize + 0.5f * zoneSize;
+                player.transform.position = playerPos;
+
+                Vector3 camPos = camera.transform.position;
+                camPos.x = playerPos.x;
+                camPos.z = playerPos.z;
+                camera.transform.position = camPos;
             }
         }
     }
