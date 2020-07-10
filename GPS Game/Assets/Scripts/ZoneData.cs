@@ -20,6 +20,9 @@ public class ZoneData
     [NonSerialized]
     private GameObject gameObject;
 
+    [NonSerialized]
+    public static readonly int[] intervals = new int[] { 1, 2, 4, 8, 12, 24, 48, 72, 168, 336, 504, 672};
+
     public ZoneData(GameObject gameObject, ZoneID zoneID)
     {
         this.gameObject = gameObject;
@@ -76,7 +79,12 @@ public class ZoneData
         {
             points++;
             lastVisit = DateTime.Now;
-            nextVisit = lastVisit.AddHours(points);
+            int newInterval = intervals[intervals.Length - 1];
+            if(points <= intervals.Length)
+            {
+                newInterval = intervals[points - 1];
+            }
+            nextVisit = lastVisit.AddHours(newInterval);
             ApplyGameObjectText();
         }
     }
