@@ -23,6 +23,7 @@ public class WorldManager : MonoBehaviour
     public const int zoneSize = 10;
 
     private bool forceOnEnter = false;
+    private bool centerCameraOnPlayer = true;
 
     private Dictionary<ZoneID, ZoneData> zones = new Dictionary<ZoneID, ZoneData>();
 
@@ -59,29 +60,18 @@ public class WorldManager : MonoBehaviour
                 }
 
                 EnterZone(zoneID, forceOnEnter);
+
+                if (forceOnEnter)
+                {
+                    RepositionPlayer(zoneID);
+                    CenterCameraOnPlayer(player.transform.position);
+                }
+
                 forceOnEnter = false;
             }
             else
             {
-                //Interpolate position in zone and move player to said position.
-                Vector2 gpsLocation = GPSManager.position;
-                Vector2 thisZoneStart = new Vector2(tilex2long(zoneID.x, zoomLevel), tiley2lat(zoneID.y, zoomLevel));
-                Vector2 nextZoneStartX = new Vector2(tilex2long(zoneID.x + 1, zoomLevel), tiley2lat(zoneID.y, zoomLevel));
-                Vector2 nextZoneStartY = new Vector2(tilex2long(zoneID.x, zoomLevel), tiley2lat(zoneID.y + 1, zoomLevel));
-                float percentageX = (gpsLocation.x - thisZoneStart.x) / (nextZoneStartX.x - thisZoneStart.x);
-                float percentageY = (gpsLocation.y - thisZoneStart.y) / (nextZoneStartY.y - thisZoneStart.y);
-                if (percentageY < 0) percentageY = 0;
-                if (percentageX < 0) percentageX = 0;
-
-                Vector3 playerPos = player.transform.position;
-                playerPos.x = zones[zoneID].GetGameObject().transform.position.x + percentageX * zoneSize - 0.5f * zoneSize;
-                playerPos.z = zones[zoneID].GetGameObject().transform.position.z + -1 * percentageY * zoneSize + 0.5f * zoneSize;
-                player.transform.position = playerPos;
-
-                Vector3 camPos = camera.transform.position;
-                camPos.x = playerPos.x;
-                camPos.z = playerPos.z;
-                camera.transform.position = camPos;
+                RepositionPlayer(zoneID);
             }
         }
     }
@@ -195,6 +185,42 @@ public class WorldManager : MonoBehaviour
         {
             zoneData.reposition(playerZone, zoneSize);
         }
+    }
+
+    private void CenterCameraOnPlayer(Vector3 playerPos)
+    {
+        Vector3 camPos = camera.transform.position;
+        camPos.x = playerPos.x;
+        camPos.z = playerPos.z;
+        camera.transform.position = camPos;
+    }
+
+    private void RepositionPlayer(ZoneID zoneID)
+    {
+        //Interpolate position in zone and move player to said position.
+        Vector2 gpsLocation = GPSManager.position;
+        Vector2 thisZoneStart = new Vector2(tilex2long(zoneID.x, zoomLevel), tiley2lat(zoneID.y, zoomLevel));
+        Vector2 nextZoneStartX = new Vector2(tilex2long(zoneID.x + 1, zoomLevel), tiley2lat(zoneID.y, zoomLevel));
+        Vector2 nextZoneStartY = new Vector2(tilex2long(zoneID.x, zoomLevel), tiley2lat(zoneID.y + 1, zoomLevel));
+        float percentageX = (gpsLocation.x - thisZoneStart.x) / (nextZoneStartX.x - thisZoneStart.x);
+        float percentageY = (gpsLocation.y - thisZoneStart.y) / (nextZoneStartY.y - thisZoneStart.y);
+        if (percentageY < 0) percentageY = 0;
+        if (percentageX < 0) percentageX = 0;
+
+        Vector3 playerPos = player.transform.position;
+        playerPos.x = zones[zoneID].GetGameObject().transform.position.x + percentageX * zoneSize - 0.5f * zoneSize;
+        playerPos.z = zones[zoneID].GetGameObject().transform.position.z + -1 * percentageY * zoneSize + 0.5f * zoneSize;
+        player.transform.position = playerPos;
+
+        if (centerCameraOnPlayer)
+        {
+            CenterCameraOnPlayer(playerPos);
+        }
+    }
+
+    public void OnCenterButtonClick()
+    {
+        centerCameraOnPlayer = !centerCameraOnPlayer;
     }
 
     int long2tilex(float lon, int z)
