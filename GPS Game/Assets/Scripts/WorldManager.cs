@@ -47,7 +47,6 @@ public class WorldManager : MonoBehaviour
 
             if (zoneID != playerZone || forceOnEnter)
             {
-                forceOnEnter = false;
                 playerZone = zoneID;
 
                 if (!PosHasZone(GPSManager.position))
@@ -56,9 +55,11 @@ public class WorldManager : MonoBehaviour
                     GameObject copy = Instantiate(zonePrefab, zoneLocation, Quaternion.identity);
                     ZoneData zone = new ZoneData(copy, zoneID);
                     zones.Add(zoneID, zone);
+                    forceOnEnter = true;
                 }
 
-                EnterZone(zoneID);
+                EnterZone(zoneID, forceOnEnter);
+                forceOnEnter = false;
             }
             else
             {
@@ -73,8 +74,8 @@ public class WorldManager : MonoBehaviour
                 if (percentageX < 0) percentageX = 0;
 
                 Vector3 playerPos = player.transform.position;
-                playerPos.x = percentageX * zoneSize - 0.5f * zoneSize;
-                playerPos.z = -1 * percentageY * zoneSize + 0.5f * zoneSize;
+                playerPos.x = zones[zoneID].GetGameObject().transform.position.x + percentageX * zoneSize - 0.5f * zoneSize;
+                playerPos.z = zones[zoneID].GetGameObject().transform.position.z + -1 * percentageY * zoneSize + 0.5f * zoneSize;
                 player.transform.position = playerPos;
 
                 Vector3 camPos = camera.transform.position;
@@ -169,12 +170,18 @@ public class WorldManager : MonoBehaviour
     /// Gets called every time a player enters a zone and at game launch.
     /// </summary>
     /// <param name="zoneID">THe zoneID of zone the player entered.</param>
-    private void EnterZone(ZoneID zoneID)
+    private void EnterZone(ZoneID zoneID, bool forceReposition)
     {
         zones[zoneID].OnEnter();
         scoreLabel.text = "Score: " + CalculateScore();
         zonesLabel.text = "Zones: " + zones.Count;
-        RepositionZones();
+
+        int recalcAMount = 1000;
+        if(player.transform.position.x >= recalcAMount || player.transform.position.z >= recalcAMount || forceReposition)
+        {
+            RepositionZones();
+        }
+        
         SaveWorld();
     }
 

@@ -106,6 +106,11 @@ public class ZoneData
         }
     }
 
+    internal GameObject GetGameObject()
+    {
+        return gameObject;
+    }
+
     /// <summary>
     /// Is called if there is no game object in order to create the game object
     /// </summary>
