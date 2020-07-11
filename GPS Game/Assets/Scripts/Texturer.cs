@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -9,6 +10,8 @@ using UnityEngine.Networking;
 /// </summary>
 public class Texturer : MonoBehaviour
 {
+    public static GameObject player;
+    
     /// <summary>
     /// Entrypoint to get the texture from the web.
     /// </summary>

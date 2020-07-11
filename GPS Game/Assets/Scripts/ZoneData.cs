@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UIElements;
 
 [Serializable]
 public class ZoneData
@@ -16,6 +17,7 @@ public class ZoneData
     public DateTime lastVisit;
     public int points;
     public DateTime nextVisit;
+    public bool lineActive = false;
 
     [NonSerialized]
     private GameObject gameObject;
@@ -141,19 +143,35 @@ public class ZoneData
         tmpPoints.text = points.ToString();
     }
 
-    public void Update()
+    public void Update(Vector3 playerPosition)
     {
+        LineRenderer lineRenderer = gameObject.GetComponent<LineRenderer>();
+        
+
         if(DateTime.Now > nextVisit)
         {
             gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.green;
+            if (lineActive)
+            {
+                lineRenderer.positionCount = 2;
+                lineRenderer.SetPosition(0, playerPosition + new Vector3(0, 0.5f, 0));
+                lineRenderer.SetPosition(1, gameObject.transform.position);
+            }
+            else
+            {
+                lineRenderer.positionCount = 0;
+            }
+            
         }
         else if(DateTime.Today == nextVisit.Date)
         {
             gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.yellow;
+            lineRenderer.positionCount = 0;
         }
         else
         {
             gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.white;
+            lineRenderer.positionCount = 0;
         }
     }
 
@@ -169,5 +187,19 @@ public class ZoneData
 
         Vector3 zoneLocation = new Vector3(dx * zoneSize, -0.05f, -1 * dy * zoneSize);
         gameObject.transform.position = zoneLocation;
+    }
+
+    public float GetDistanceFromPlayer(Vector3 playerPosition)
+    {
+        return Vector3.Distance(gameObject.transform.position, playerPosition);
+    }
+
+    public bool CanVisit()
+    {
+        if(DateTime.Now >= nextVisit || lastVisit == null)
+        {
+            return true;
+        }
+        return false;
     }
 }

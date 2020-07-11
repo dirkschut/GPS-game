@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
@@ -39,7 +40,7 @@ public class WorldManager : MonoBehaviour
     {
         foreach(ZoneData zoneData in zones.Values)
         {
-            zoneData.Update();
+            zoneData.Update(player.transform.position);
         }
 
         if (GPSManager.IsReady)
@@ -171,8 +172,28 @@ public class WorldManager : MonoBehaviour
         {
             RepositionZones();
         }
+
+        SetLines();
         
         SaveWorld();
+    }
+
+    private void SetLines()
+    {
+        int lineCount = 0;
+        int maxLines = 5;
+        foreach(KeyValuePair<ZoneID, ZoneData> zone in zones.OrderBy(key => key.Value.GetDistanceFromPlayer(player.transform.position)))
+        {
+            if(zone.Value.CanVisit() && lineCount < maxLines)
+            {
+                zone.Value.lineActive = true;
+                lineCount++;
+            }
+            else
+            {
+                zone.Value.lineActive = false;
+            }
+        }
     }
 
     /// <summary>
