@@ -53,9 +53,8 @@ public class WorldManager : MonoBehaviour
 
                 if (!PosHasZone(GPSManager.position))
                 {
-                    Vector3 zoneLocation = new Vector3(zoneID.x * zoneSize, -0.05f, -1 * zoneID.y * zoneSize);
-                    GameObject copy = Instantiate(zonePrefab, zoneLocation, Quaternion.identity);
-                    ZoneData zone = new ZoneData(copy, zoneID);
+                    ZoneData zone = new ZoneData(zoneID);
+                    zone.SetActive(true);
                     zones.Add(zoneID, zone);
                     forceOnEnter = true;
                 }
@@ -98,10 +97,6 @@ public class WorldManager : MonoBehaviour
             FileStream file = File.Open(Application.persistentDataPath + "/gamesave.save", FileMode.Open);
             zones = (Dictionary<ZoneID, ZoneData>)bf.Deserialize(file);
             file.Close();
-            foreach (ZoneData zoneData in zones.Values)
-            {
-                zoneData.InitializeFromSave();
-            }
         }
     }
 
@@ -167,33 +162,44 @@ public class WorldManager : MonoBehaviour
         scoreLabel.text = "Score: " + CalculateScore();
         zonesLabel.text = "Zones: " + zones.Count;
 
+        bool forceRecalc = false;
+        int lineCount = 0;
+        int maxLines = 5;
+        int zoneCount = 0;
+        int maxZones = 250;
+        foreach (KeyValuePair<ZoneID, ZoneData> zone in zones.OrderBy(key => key.Value.GetDistanceFromPlayer(playerZone)))
+        {
+            if(zoneCount < maxZones || lineCount < maxLines)
+            {
+                zoneCount++;
+                if (zone.Value.SetActive(true))
+                {
+                    forceRecalc = true;
+                }
+
+                if (zone.Value.CanVisit() && lineCount < maxLines)
+                {
+                    zone.Value.lineActive = true;
+                    lineCount++;
+                }
+                else
+                {
+                    zone.Value.lineActive = false;
+                }
+            }
+            else
+            {
+                zone.Value.SetActive(false);
+            }
+        }
+
         int recalcAMount = 1000;
-        if(player.transform.position.x >= recalcAMount || player.transform.position.z >= recalcAMount || forceReposition)
+        if (player.transform.position.x >= recalcAMount || player.transform.position.z >= recalcAMount || forceReposition || forceRecalc)
         {
             RepositionZones();
         }
 
-        SetLines();
-        
         SaveWorld();
-    }
-
-    private void SetLines()
-    {
-        int lineCount = 0;
-        int maxLines = 5;
-        foreach(KeyValuePair<ZoneID, ZoneData> zone in zones.OrderBy(key => key.Value.GetDistanceFromPlayer(player.transform.position)))
-        {
-            if(zone.Value.CanVisit() && lineCount < maxLines)
-            {
-                zone.Value.lineActive = true;
-                lineCount++;
-            }
-            else
-            {
-                zone.Value.lineActive = false;
-            }
-        }
     }
 
     /// <summary>

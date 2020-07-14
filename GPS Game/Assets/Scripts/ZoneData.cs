@@ -25,18 +25,9 @@ public class ZoneData
     [NonSerialized]
     public static readonly int[] intervals = new int[] { 1, 2, 4, 8, 12, 24, 48, 72, 168, 336, 504, 672};
 
-    public ZoneData(GameObject gameObject, ZoneID zoneID)
+    public ZoneData(ZoneID zoneID)
     {
-        this.gameObject = gameObject;
         this.zoneID = zoneID;
-        ApplyTexture();
-    }
-
-    public void InitializeFromSave()
-    {
-        gameObject = CreateGameObject();
-        ApplyTexture();
-        ApplyGameObjectText();
     }
 
     /// <summary>
@@ -145,34 +136,39 @@ public class ZoneData
 
     public void Update(Vector3 playerPosition)
     {
-        LineRenderer lineRenderer = gameObject.GetComponent<LineRenderer>();
-        
-
-        if(DateTime.Now > nextVisit)
+        if(gameObject != null)
         {
-            gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.green;
-            if (lineActive)
+            ApplyGameObjectText();
+            LineRenderer lineRenderer = gameObject.GetComponent<LineRenderer>();
+
+
+            if (DateTime.Now > nextVisit)
             {
-                lineRenderer.positionCount = 2;
-                lineRenderer.SetPosition(0, playerPosition + new Vector3(0, 0.5f, 0));
-                lineRenderer.SetPosition(1, gameObject.transform.position);
+                gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.green;
+                if (lineActive)
+                {
+                    lineRenderer.positionCount = 2;
+                    lineRenderer.SetPosition(0, playerPosition + new Vector3(0, 0.5f, 0));
+                    lineRenderer.SetPosition(1, gameObject.transform.position);
+                }
+                else
+                {
+                    lineRenderer.positionCount = 0;
+                }
+
+            }
+            else if (DateTime.Today == nextVisit.Date)
+            {
+                gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.yellow;
+                lineRenderer.positionCount = 0;
             }
             else
             {
+                gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.white;
                 lineRenderer.positionCount = 0;
             }
-            
         }
-        else if(DateTime.Today == nextVisit.Date)
-        {
-            gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.yellow;
-            lineRenderer.positionCount = 0;
-        }
-        else
-        {
-            gameObject.GetComponent<Renderer>().material.color = UnityEngine.Color.white;
-            lineRenderer.positionCount = 0;
-        }
+        
     }
 
     /// <summary>
@@ -182,16 +178,19 @@ public class ZoneData
     /// <param name="zoneSize">The size of each zone.</param>
     public void reposition(ZoneID playerZone, float zoneSize)
     {
-        int dx = zoneID.x - playerZone.x;
-        int dy = zoneID.y - playerZone.y;
+        if(gameObject != null)
+        {
+            int dx = zoneID.x - playerZone.x;
+            int dy = zoneID.y - playerZone.y;
 
-        Vector3 zoneLocation = new Vector3(dx * zoneSize, -0.05f, -1 * dy * zoneSize);
-        gameObject.transform.position = zoneLocation;
+            Vector3 zoneLocation = new Vector3(dx * zoneSize, -0.05f, -1 * dy * zoneSize);
+            gameObject.transform.position = zoneLocation;
+        }
     }
 
-    public float GetDistanceFromPlayer(Vector3 playerPosition)
+    public float GetDistanceFromPlayer(ZoneID playerZone)
     {
-        return Vector3.Distance(gameObject.transform.position, playerPosition);
+        return Vector2.Distance(new Vector2(zoneID.x, zoneID.y), new Vector2(playerZone.x, playerZone.y));
     }
 
     public bool CanVisit()
@@ -199,6 +198,22 @@ public class ZoneData
         if(DateTime.Now >= nextVisit || lastVisit == null)
         {
             return true;
+        }
+        return false;
+    }
+
+    public bool SetActive(bool active)
+    {
+        if (active && gameObject == null)
+        {
+            gameObject = CreateGameObject();
+            ApplyTexture();
+            ApplyGameObjectText();
+            return true;
+        }
+        else if(gameObject != null && !active)
+        {
+            GameObject.Destroy(gameObject);
         }
         return false;
     }
