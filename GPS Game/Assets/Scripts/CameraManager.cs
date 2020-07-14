@@ -20,47 +20,56 @@ public class CameraManager : MonoBehaviour
     {
         if(Application.platform == RuntimePlatform.Android)
         {
-            if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved)
-            {
-                Vector2 touchDelta = Input.GetTouch(0).deltaPosition;
-                transform.transform.Translate(-touchDelta.x * touchCameraSpeed * Camera.main.fieldOfView, -touchDelta.y * touchCameraSpeed * Camera.main.fieldOfView, 0);
-            }
-            //Zoom
-            else if (Input.touchCount == 2)
-            {
-                Touch firstTouch = Input.GetTouch(0);
-                Touch secondTouch = Input.GetTouch(1);
-                float touchDistance = Vector2.Distance(firstTouch.position, secondTouch.position);
-
-                Vector2 firstTouchPrevious = firstTouch.position - firstTouch.deltaPosition;
-                Vector2 secondTouchPrevious = secondTouch.position - secondTouch.deltaPosition;
-                float previousTouchDistance = Vector2.Distance(firstTouchPrevious, secondTouchPrevious);
-
-                float delta = previousTouchDistance - touchDistance;
-                Camera.main.fieldOfView += delta * touchZoomSpeed;
-            }
+            UpdateAndroid();
         }
         else
         {
-            //Pan
-            if (Input.GetMouseButtonDown(0))
-            {
-                oldMousePos = Input.mousePosition;
-            }
-            else if (Input.GetMouseButton(0) && oldMousePos != null)
-            {
-                Vector2 currentMousePos = Input.mousePosition;
-                Vector2 deltaPos = oldMousePos -= currentMousePos;
-                oldMousePos = currentMousePos;
-                Camera.main.transform.Translate(deltaPos * Camera.main.fieldOfView * mouseCameraSpeed);
-            }
-
-            //Zoom
-            float scrollDelta = Input.mouseScrollDelta.y;
-            Camera.main.fieldOfView -= scrollDelta * mouseZoomSpeed;
+            UpdatePC();
         }
 
         Camera.main.fieldOfView = Mathf.Clamp(Camera.main.fieldOfView, minZoom, maxZoom);
+    }
 
+    private void UpdateAndroid()
+    {
+        if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved)
+        {
+            Vector2 touchDelta = Input.GetTouch(0).deltaPosition;
+            transform.transform.Translate(-touchDelta.x * touchCameraSpeed * Camera.main.fieldOfView, -touchDelta.y * touchCameraSpeed * Camera.main.fieldOfView, 0);
+        }
+        //Zoom
+        else if (Input.touchCount == 2)
+        {
+            Touch firstTouch = Input.GetTouch(0);
+            Touch secondTouch = Input.GetTouch(1);
+            float touchDistance = Vector2.Distance(firstTouch.position, secondTouch.position);
+
+            Vector2 firstTouchPrevious = firstTouch.position - firstTouch.deltaPosition;
+            Vector2 secondTouchPrevious = secondTouch.position - secondTouch.deltaPosition;
+            float previousTouchDistance = Vector2.Distance(firstTouchPrevious, secondTouchPrevious);
+
+            float delta = previousTouchDistance - touchDistance;
+            Camera.main.fieldOfView += delta * touchZoomSpeed;
+        }
+    }
+
+    private void UpdatePC()
+    {
+        //Pan
+        if (Input.GetMouseButtonDown(0))
+        {
+            oldMousePos = Input.mousePosition;
+        }
+        else if (Input.GetMouseButton(0) && oldMousePos != null)
+        {
+            Vector2 currentMousePos = Input.mousePosition;
+            Vector2 deltaPos = oldMousePos -= currentMousePos;
+            oldMousePos = currentMousePos;
+            Camera.main.transform.Translate(deltaPos * Camera.main.fieldOfView * mouseCameraSpeed);
+        }
+
+        //Zoom
+        float scrollDelta = Input.mouseScrollDelta.y;
+        Camera.main.fieldOfView -= scrollDelta * mouseZoomSpeed;
     }
 }
