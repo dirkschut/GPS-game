@@ -31,7 +31,12 @@ public class GPSManager : MonoBehaviour
                 Permission.RequestUserPermission(Permission.FineLocation);
 
 
-                yield break;
+                int maxWaitPermission = 120;
+                while (!Input.location.isEnabledByUser && maxWaitPermission > 0)
+                {
+                    yield return new WaitForSeconds(2);
+                    maxWaitPermission--;
+                }
             }
 
 
