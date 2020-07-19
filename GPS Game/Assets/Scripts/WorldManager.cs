@@ -14,6 +14,7 @@ public class WorldManager : MonoBehaviour
     public Camera camera;
     public GameObject player;
     public GameObject zonePrefab;
+    public GameObject currentZoneMarker;
     public TMPro.TextMeshProUGUI scoreLabel;
     public TMPro.TextMeshProUGUI zonesLabel;
 
@@ -198,6 +199,8 @@ public class WorldManager : MonoBehaviour
         {
             RepositionZones();
         }
+
+        currentZoneMarker.transform.position = zones[zoneID].GetGameObject().transform.position;
 
         SaveWorld();
     }
