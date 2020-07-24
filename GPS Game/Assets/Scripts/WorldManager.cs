@@ -16,6 +16,7 @@ public class WorldManager : MonoBehaviour
     public GameObject zonePrefab;
     public GameObject currentZoneMarker;
     public TMPro.TextMeshProUGUI scoreLabel;
+
     public TMPro.TextMeshProUGUI zonesLabel;
 
     private ZoneID playerZone;
@@ -253,22 +254,31 @@ public class WorldManager : MonoBehaviour
         centerCameraOnPlayer = !centerCameraOnPlayer;
     }
 
-    int long2tilex(float lon, int z)
+    public ZoneData GetZoneData(ZoneID zoneID)
+    {
+        if (zones.ContainsKey(zoneID))
+        {
+            return zones[zoneID];
+        }
+        return null;
+    }
+
+    public static int long2tilex(float lon, int z)
     {
         return (int)Mathf.Floor((lon + 180.0f) / 360.0f * (1 << z));
     }
 
-    int lat2tiley(float lat, int z)
+    public static int lat2tiley(float lat, int z)
     {
         return (int)Mathf.Floor((1 - Mathf.Log(Mathf.Tan(Mathf.Deg2Rad * lat) + 1 / Mathf.Cos(Mathf.Deg2Rad * lat)) / Mathf.PI) / 2 * (1 << z));
     }
 
-    float tilex2long(int x, int z)
+    public static float tilex2long(int x, int z)
     {
         return x / (float)(1 << z) * 360.0f - 180;
     }
 
-    float tiley2lat(int y, int z)
+    public static float tiley2lat(int y, int z)
     {
         float n = Mathf.PI - 2.0f * Mathf.PI * y / (float)(1 << z);
         return 180.0f / Mathf.PI * Mathf.Atan(0.5f * (Mathf.Exp(n) - Mathf.Exp(-n)));

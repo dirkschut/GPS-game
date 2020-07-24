@@ -18,6 +18,11 @@ public struct ZoneID
         this.y = y;
     }
 
+    public ZoneData GetZoneData()
+    {
+        return GameObject.FindGameObjectWithTag("GameManager").GetComponent<WorldManager>().GetZoneData(this);
+    }
+
     public override bool Equals(object obj)
     {
         return base.Equals(obj);
@@ -36,5 +41,10 @@ public struct ZoneID
     public static bool operator !=(ZoneID id1, ZoneID id2)
     {
         return !id1.Equals(id2);
+    }
+
+    public override string ToString()
+    {
+        return x + ", " + y;
     }
 }

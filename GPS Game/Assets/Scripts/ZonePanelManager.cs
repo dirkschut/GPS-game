@@ -5,48 +5,31 @@ using UnityEngine;
 public class ZonePanelManager : MonoBehaviour
 {
     private ZoneID zoneID;
+    public bool isOpen = false;
 
-    // Update is called once per frame
-    void Update()
+    public TMPro.TextMeshProUGUI nameLabel;
+    public TMPro.TextMeshProUGUI coordinatesLabel;
+    public TMPro.TextMeshProUGUI pointsLabel;
+    public TMPro.TextMeshProUGUI labelsLabel;
+    
+    public void OpenZoneID(ZoneID zoneID)
     {
-        if(ShouldCastRay())
-        {
-            Ray camRay = Camera.main.ScreenPointToRay(GetRayPosition());
-            RaycastHit raycastHit;
-            if (Physics.Raycast(camRay, out raycastHit, 1000f))
-            {
-                GameObject gameObject = raycastHit.transform.gameObject;
-                if (gameObject.CompareTag("Zone"))
-                {
-                    this.zoneID = gameObject.GetComponent<ZoneIDGetter>().ZoneID;
-                    this.GetComponent<TMPro.TextMeshProUGUI>().text = zoneID.x + ", " + zoneID.y;
-                }
-            }
-        }
+        this.zoneID = zoneID;
+        UpdateText();
+        gameObject.SetActive(true);
+        this.isOpen = true;
     }
 
-    private bool ShouldCastRay()
+    public void ClosePanel()
     {
-        if(Application.platform == RuntimePlatform.Android)
-        {
-            if (Input.GetTouch(0).phase == TouchPhase.Began) return true;
-        }
-        else
-        {
-            if (Input.GetMouseButtonDown(0)) return true;
-        }
-        return false;
+        gameObject.SetActive(false);
+        this.isOpen = false;
     }
 
-    private Vector2 GetRayPosition()
+    private void UpdateText()
     {
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            return Input.GetTouch(0).position;
-        }
-        else
-        {
-            return Input.mousePosition;
-        }
+        nameLabel.text = "Name: " + zoneID.ToString();
+        coordinatesLabel.text = "Coords: lat: " + WorldManager.tiley2lat(zoneID.y, WorldManager.zoomLevel) + ", long: " + WorldManager.tilex2long(zoneID.x, WorldManager.zoomLevel);
+        pointsLabel.text = "Points: " + zoneID.GetZoneData().points;
     }
 }
