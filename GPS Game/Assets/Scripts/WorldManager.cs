@@ -168,7 +168,7 @@ public class WorldManager : MonoBehaviour
         int lineCount = 0;
         int maxLines = 5;
         int zoneCount = 0;
-        int maxZones = 250;
+        int maxZones = 500;
         foreach (KeyValuePair<ZoneID, ZoneData> zone in zones.OrderBy(key => key.Value.GetDistanceFromPlayer(playerZone)))
         {
             if(zoneCount < maxZones || lineCount < maxLines)
