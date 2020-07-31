@@ -17,7 +17,11 @@ public class ZoneData
     public DateTime lastVisit;
     public int points;
     public DateTime nextVisit;
+
+    [NonSerialized]
     public bool lineActive = false;
+    [NonSerialized]
+    public UnityEngine.Color lineColor = UnityEngine.Color.green;
 
     [NonSerialized]
     private GameObject gameObject;
@@ -152,6 +156,7 @@ public class ZoneData
                     lineRenderer.positionCount = 2;
                     lineRenderer.SetPosition(0, playerPosition + new Vector3(0, 0.5f, 0));
                     lineRenderer.SetPosition(1, gameObject.transform.position);
+                    lineRenderer.material.color = lineColor;
                 }
                 else
                 {

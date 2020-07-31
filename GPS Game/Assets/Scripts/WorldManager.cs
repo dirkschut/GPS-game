@@ -166,11 +166,25 @@ public class WorldManager : MonoBehaviour
 
         bool forceRecalc = false;
         int lineCount = 0;
-        int maxLines = 5;
+        int maxLines = 4;
         int zoneCount = 0;
         int maxZones = 500;
+        ZoneID closestHigestZone = default;
+        int closestHigestScore = 0;
         foreach (KeyValuePair<ZoneID, ZoneData> zone in zones.OrderBy(key => key.Value.GetDistanceFromPlayer(playerZone)))
         {
+            //Calculate the closest highest zone.
+            if(zone.Value.points > closestHigestScore && zone.Value.CanVisit())
+            {
+                closestHigestScore = zone.Value.points;
+                closestHigestZone = zone.Key;
+            }
+            else if(closestHigestScore == zone.Value.points && zone.Value.GetDistanceFromPlayer(playerZone) < zones[closestHigestZone].GetDistanceFromPlayer(playerZone) && zone.Value.CanVisit())
+            {
+                closestHigestScore = zone.Value.points;
+                closestHigestZone = zone.Key;
+            }
+
             if(zoneCount < maxZones || lineCount < maxLines)
             {
                 zoneCount++;
@@ -182,6 +196,7 @@ public class WorldManager : MonoBehaviour
                 if (zone.Value.CanVisit() && lineCount < maxLines)
                 {
                     zone.Value.lineActive = true;
+                    zone.Value.lineColor = UnityEngine.Color.green;
                     lineCount++;
                 }
                 else
@@ -194,6 +209,11 @@ public class WorldManager : MonoBehaviour
                 zone.Value.SetActive(false);
             }
         }
+
+        //Activate closest highest zone.
+        zones[closestHigestZone].SetActive(true);
+        zones[closestHigestZone].lineActive = true;
+        zones[closestHigestZone].lineColor = Color.blue;
 
         int recalcAMount = 1000;
         if (player.transform.position.x >= recalcAMount || player.transform.position.z >= recalcAMount || forceReposition || forceRecalc)
