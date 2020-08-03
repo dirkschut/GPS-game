@@ -20,6 +20,7 @@ public class WorldManager : MonoBehaviour
     public TMPro.TextMeshProUGUI zonesLabel;
 
     private ZoneID playerZone;
+    private ZoneID originZone;
 
     public const int scalar = 10000;
     public const int zoomLevel = 18;
@@ -56,7 +57,7 @@ public class WorldManager : MonoBehaviour
                 if (!PosHasZone(GPSManager.position))
                 {
                     ZoneData zone = new ZoneData(zoneID);
-                    zone.SetActive(true);
+                    zone.SetActive(true, originZone);
                     zones.Add(zoneID, zone);
                     forceOnEnter = true;
                 }
@@ -164,7 +165,6 @@ public class WorldManager : MonoBehaviour
         scoreLabel.text = "Score: " + CalculateScore();
         zonesLabel.text = "Zones: " + zones.Count;
 
-        bool forceRecalc = false;
         int lineCount = 0;
         int maxLines = 4;
         int zoneCount = 0;
@@ -188,10 +188,7 @@ public class WorldManager : MonoBehaviour
             if(zoneCount < maxZones || lineCount < maxLines)
             {
                 zoneCount++;
-                if (zone.Value.SetActive(true))
-                {
-                    forceRecalc = true;
-                }
+                zone.Value.SetActive(true, originZone);
 
                 if (zone.Value.CanVisit() && lineCount < maxLines)
                 {
@@ -206,17 +203,17 @@ public class WorldManager : MonoBehaviour
             }
             else
             {
-                zone.Value.SetActive(false);
+                zone.Value.SetActive(false, originZone);
             }
         }
 
         //Activate closest highest zone.
-        zones[closestHigestZone].SetActive(true);
+        zones[closestHigestZone].SetActive(true, originZone);
         zones[closestHigestZone].lineActive = true;
         zones[closestHigestZone].lineColor = Color.blue;
 
         int recalcAMount = 1000;
-        if (player.transform.position.x >= recalcAMount || player.transform.position.z >= recalcAMount || forceReposition || forceRecalc)
+        if (player.transform.position.x >= recalcAMount || player.transform.position.z >= recalcAMount || forceReposition)
         {
             RepositionZones();
         }
@@ -232,6 +229,7 @@ public class WorldManager : MonoBehaviour
     private void RepositionZones()
     {
         Debug.Log("Reposition");
+        originZone = playerZone;
         foreach (ZoneData zoneData in zones.Values)
         {
             zoneData.reposition(playerZone, zoneSize);

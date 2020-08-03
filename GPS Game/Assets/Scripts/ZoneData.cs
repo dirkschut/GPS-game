@@ -209,11 +209,12 @@ public class ZoneData
         return false;
     }
 
-    public bool SetActive(bool active)
+    public bool SetActive(bool active, ZoneID originZOne)
     {
         if (active && gameObject == null)
         {
             gameObject = CreateGameObject();
+            reposition(originZOne, WorldManager.zoneSize);
             ApplyTexture();
             ApplyGameObjectText();
             return true;
