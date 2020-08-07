@@ -27,7 +27,30 @@ public class ZoneData
     private GameObject gameObject;
 
     [NonSerialized]
-    public static readonly int[] intervals = new int[] { 1, 2, 4, 8, 12, 24, 48, 72, 168, 336, 504, 672};
+    public static readonly int[] intervals = new int[] {
+        1,                      //1: 1 hour
+        2,                      //2: 2 hours
+        4,                      //3: 4 hours
+        8,                      //4: 8 hours
+        12,                     //5: 12 hours
+        24,                     //6: 1 day
+        24 * 2,                 //7: 2 days
+        24 * 3,                 //8: 3 days
+        24 * 7,                 //9: 1 week
+        24 * 7 * 2,             //10: 2 weeks
+        24 * 30,                //11: 1 month
+        24 * 30 * 2,            //12: 2 months
+        24 * 30 * 3,            //13: 3 months
+        24 * 30 * 4,            //14: 4 months
+        24 * 30 * 5,            //15: 5 months
+        24 * 30 * 6,            //16: 6 months
+        24 * 30 * 7,            //17: 7 months
+        24 * 30 * 8,            //18: 8 months
+        24 * 30 * 9,            //19: 9 months
+        24 * 30 * 10,           //20: 10 months
+        24 * 30 * 11,           //21: 11 months
+        24 * 30 * 12,           //22: 12 months
+    };
 
     public ZoneData(ZoneID zoneID)
     {
