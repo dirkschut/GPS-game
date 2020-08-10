@@ -169,17 +169,23 @@ public class WorldManager : MonoBehaviour
         int maxLines = 4;
         int zoneCount = 0;
         int maxZones = 500;
+        float closestHighestMaxDistance = 20f;
         ZoneID closestHigestZone = default;
         int closestHigestScore = 0;
         foreach (KeyValuePair<ZoneID, ZoneData> zone in zones.OrderBy(key => key.Value.GetDistanceFromPlayer(playerZone)))
         {
             //Calculate the closest highest zone.
-            if(zone.Value.points > closestHigestScore && zone.Value.CanVisit())
+            if(zone.Value.points > closestHigestScore
+                && zone.Value.CanVisit()
+                && zone.Value.GetDistanceFromPlayer(playerZone) <= closestHighestMaxDistance)
             {
                 closestHigestScore = zone.Value.points;
                 closestHigestZone = zone.Key;
             }
-            else if(closestHigestScore == zone.Value.points && zone.Value.GetDistanceFromPlayer(playerZone) < zones[closestHigestZone].GetDistanceFromPlayer(playerZone) && zone.Value.CanVisit())
+            else if(closestHigestScore == zone.Value.points
+                && zone.Value.GetDistanceFromPlayer(playerZone) < zones[closestHigestZone].GetDistanceFromPlayer(playerZone)
+                && zone.Value.CanVisit()
+                && zone.Value.GetDistanceFromPlayer(playerZone) <= closestHighestMaxDistance)
             {
                 closestHigestScore = zone.Value.points;
                 closestHigestZone = zone.Key;
@@ -208,10 +214,14 @@ public class WorldManager : MonoBehaviour
         }
 
         //Activate closest highest zone.
-        zones[closestHigestZone].SetActive(true, originZone);
-        zones[closestHigestZone].lineActive = true;
-        zones[closestHigestZone].lineColor = Color.blue;
+        if (closestHigestZone != default)
+        {
+            zones[closestHigestZone].SetActive(true, originZone);
+            zones[closestHigestZone].lineActive = true;
+            zones[closestHigestZone].lineColor = Color.blue;
+        }
 
+        //Reposition zones if the player gets too far from the origin
         int recalcAMount = 1000;
         if (player.transform.position.x >= recalcAMount || player.transform.position.z >= recalcAMount || forceReposition)
         {
