@@ -119,7 +119,6 @@ public class ZoneData
     /// <param name="gameObject"></param>
     public void ApplyTexture()
     {
-        Debug.Log("Loading Image");
         if (File.Exists(GetImagePath()))
         {
             gameObject.GetComponent<Texturer>().SetTextureFromFile(GetImagePath());
