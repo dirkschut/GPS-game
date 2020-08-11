@@ -168,7 +168,7 @@ public class WorldManager : MonoBehaviour
         int lineCount = 0;
         int maxLines = 4;
         int zoneCount = 0;
-        int maxZones = 10;
+        int maxZones = 500;
         float closestHighestMaxDistance = 20f;
         ZoneID closestHigestZone = default;
         int closestHigestScore = 0;
