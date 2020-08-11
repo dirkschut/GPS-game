@@ -168,7 +168,7 @@ public class WorldManager : MonoBehaviour
         int lineCount = 0;
         int maxLines = 4;
         int zoneCount = 0;
-        int maxZones = 500;
+        int maxZones = 10;
         float closestHighestMaxDistance = 20f;
         ZoneID closestHigestZone = default;
         int closestHigestScore = 0;
@@ -213,19 +213,20 @@ public class WorldManager : MonoBehaviour
             }
         }
 
-        //Activate closest highest zone.
-        if (closestHigestZone != default)
-        {
-            zones[closestHigestZone].SetActive(true, originZone);
-            zones[closestHigestZone].lineActive = true;
-            zones[closestHigestZone].lineColor = Color.blue;
-        }
-
         //Reposition zones if the player gets too far from the origin
         int recalcAMount = 1000;
         if (player.transform.position.x >= recalcAMount || player.transform.position.z >= recalcAMount || forceReposition)
         {
             RepositionZones();
+        }
+
+        //Activate closest highest zone.
+        if (closestHigestZone != default)
+        {
+            zones[closestHigestZone].lineActive = true;
+            zones[closestHigestZone].lineColor = Color.blue;
+            zones[closestHigestZone].SetActive(true, originZone);
+            zones[closestHigestZone].Update(player.transform.position);
         }
 
         currentZoneMarker.transform.position = zones[zoneID].GetGameObject().transform.position;

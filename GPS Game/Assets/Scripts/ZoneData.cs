@@ -26,6 +26,10 @@ public class ZoneData
     [NonSerialized]
     private GameObject gameObject;
 
+
+    [NonSerialized]
+    private bool gameObjectDestroyed = false;
+
     [NonSerialized]
     public static readonly int[] intervals = new int[] {
         1,                      //1: 1 hour
@@ -234,8 +238,9 @@ public class ZoneData
 
     public bool SetActive(bool active, ZoneID originZOne)
     {
-        if (active && gameObject == null)
+        if (active && (gameObject == null || gameObjectDestroyed))
         {
+            gameObjectDestroyed = false;
             gameObject = CreateGameObject();
             reposition(originZOne, WorldManager.zoneSize);
             ApplyTexture();
@@ -245,6 +250,7 @@ public class ZoneData
         else if(gameObject != null && !active)
         {
             GameObject.Destroy(gameObject);
+            gameObjectDestroyed = true;
         }
         return false;
     }
