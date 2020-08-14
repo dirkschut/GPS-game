@@ -14,13 +14,14 @@ public class WorldManager : MonoBehaviour
     public Camera camera;
     public GameObject player;
     public GameObject zonePrefab;
+    public GameObject pointPrefab;
     public GameObject currentZoneMarker;
     public TMPro.TextMeshProUGUI scoreLabel;
 
     public TMPro.TextMeshProUGUI zonesLabel;
 
     private ZoneID playerZone;
-    private ZoneID originZone;
+    private static ZoneID originZone;
 
     public const int scalar = 10000;
     public const int zoomLevel = 18;
@@ -30,6 +31,7 @@ public class WorldManager : MonoBehaviour
     private bool centerCameraOnPlayer = true;
 
     private Dictionary<ZoneID, ZoneData> zones = new Dictionary<ZoneID, ZoneData>();
+    private List<GPSPoint> points = new List<GPSPoint>();
 
     // Start is called before the first frame update
     void Start()
@@ -75,6 +77,20 @@ public class WorldManager : MonoBehaviour
             else
             {
                 RepositionPlayer(zoneID);
+            }
+
+            //Track position changes
+            if (points.Count == 0)
+            {
+                GPSPoint newPoint = new GPSPoint(GPSManager.position, DateTime.Now, pointPrefab);
+                newPoint.Reposition();
+                points.Add(newPoint);
+            }
+            else if(GetDistance(points[points.Count - 1].gpsPosition, GPSManager.position) > 10.0f)
+            {
+                GPSPoint newPoint = new GPSPoint(GPSManager.position, DateTime.Now, pointPrefab);
+                newPoint.Reposition();
+                points.Add(newPoint);
             }
         }
     }
@@ -278,6 +294,29 @@ public class WorldManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Converts a given GPS position into their respective gamespace coordinates
+    /// </summary>
+    /// <param name="GPSPos">GPS position (x = lon, y = lat)</param>
+    /// <returns>Gamespace coordinates</returns>
+    public static Vector2 GPSToGameCoords(Vector2 GPSPos)
+    {
+        ZoneID zoneID = new ZoneID(long2tilex(GPSPos.x, zoomLevel), lat2tiley(GPSPos.y, zoomLevel));
+        Vector2 thisZoneStart = new Vector2(tilex2long(zoneID.x, zoomLevel), tiley2lat(zoneID.y, zoomLevel));
+        Vector2 nextZoneStartX = new Vector2(tilex2long(zoneID.x + 1, zoomLevel), tiley2lat(zoneID.y, zoomLevel));
+        Vector2 nextZoneStartY = new Vector2(tilex2long(zoneID.x, zoomLevel), tiley2lat(zoneID.y + 1, zoomLevel));
+        float percentageX = (GPSPos.x - thisZoneStart.x) / (nextZoneStartX.x - thisZoneStart.x);
+        float percentageY = (GPSPos.y - thisZoneStart.y) / (nextZoneStartY.y - thisZoneStart.y);
+        if (percentageY < 0) percentageY = 0;
+        if (percentageX < 0) percentageX = 0;
+
+        Debug.Log(GPSPos.x);
+
+        float x = (zoneID.x - originZone.x + percentageX - 0.5f) * zoneSize;
+        float y = (zoneID.y - originZone.y + percentageY - 0.5f) * zoneSize * -1;
+        return new Vector2(x, y);
+    }
+
     public void OnCenterButtonClick()
     {
         centerCameraOnPlayer = !centerCameraOnPlayer;
@@ -311,5 +350,22 @@ public class WorldManager : MonoBehaviour
     {
         float n = Mathf.PI - 2.0f * Mathf.PI * y / (float)(1 << z);
         return 180.0f / Mathf.PI * Mathf.Atan(0.5f * (Mathf.Exp(n) - Mathf.Exp(-n)));
+    }
+
+    /// <summary>
+    /// Calculates the distance between two given gps coordinates
+    /// </summary>
+    /// <param name="pos1">coordinate1</param>
+    /// <param name="pos2">coordinate2</param>
+    /// <returns>distance in meters</returns>
+    public float GetDistance(Vector2 pos1, Vector2 pos2)
+    {
+        var d1 = pos1.y * (Mathf.PI / 180.0f);
+        var num1 = pos1.x * (Mathf.PI / 180.0f);
+        var d2 = pos2.y * (Mathf.PI / 180.0f);
+        var num2 = pos2.x * (Mathf.PI / 180.0f) - num1;
+        var d3 = Mathf.Pow(Mathf.Sin((d2 - d1) / 2.0f), 2.0f) + Mathf.Cos(d1) * Mathf.Cos(d2) * Mathf.Pow(Mathf.Sin(num2 / 2.0f), 2.0f);
+
+        return 6376500.0f * (2.0f * Mathf.Atan2(Mathf.Sqrt(d3), Mathf.Sqrt(1.0f - d3)));
     }
 }
