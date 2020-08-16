@@ -22,6 +22,7 @@ public class GPSPoint
     public void SetNext(GPSPoint next)
     {
         this.next = next;
+        DrawLine();
     }
 
     public void Reposition()
@@ -29,7 +30,25 @@ public class GPSPoint
         if (gameObject != null)
         {
             Vector2 pos = WorldManager.GPSToGameCoords(gpsPosition);
-            gameObject.transform.position = new Vector3(pos.x, 0.0f, pos.y);
+            gameObject.transform.position = new Vector3(pos.x, 0.5f, pos.y);
+            if(next != null)
+            {
+                DrawLine();
+            }
         }
+    }
+
+    private void DrawLine()
+    {
+        Debug.LogWarning("DRAWLINE");
+        LineRenderer lineRenderer = gameObject.GetComponent<LineRenderer>();
+        lineRenderer.positionCount = 2;
+        lineRenderer.SetPosition(0, GetGameobjectPosition());
+        lineRenderer.SetPosition(1, next.GetGameobjectPosition());
+    }
+
+    public Vector3 GetGameobjectPosition()
+    {
+        return gameObject.transform.position;
     }
 }

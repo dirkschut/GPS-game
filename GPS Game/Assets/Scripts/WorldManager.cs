@@ -90,6 +90,7 @@ public class WorldManager : MonoBehaviour
             {
                 GPSPoint newPoint = new GPSPoint(GPSManager.position, DateTime.Now, pointPrefab);
                 newPoint.Reposition();
+                points[points.Count - 1].SetNext(newPoint);
                 points.Add(newPoint);
             }
         }
