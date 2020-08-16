@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -80,20 +81,39 @@ public class WorldManager : MonoBehaviour
             }
 
             //Track position changes
-            if (points.Count == 0)
-            {
-                GPSPoint newPoint = new GPSPoint(GPSManager.position, DateTime.Now, pointPrefab);
-                newPoint.Reposition();
-                points.Add(newPoint);
-            }
-            else if(GetDistance(points[points.Count - 1].gpsPosition, GPSManager.position) > 10.0f)
-            {
-                GPSPoint newPoint = new GPSPoint(GPSManager.position, DateTime.Now, pointPrefab);
-                newPoint.Reposition();
-                points[points.Count - 1].SetNext(newPoint);
-                points.Add(newPoint);
-            }
+            UpdatePoints();
         }
+    }
+
+    /// <summary>
+    /// Update the GPS points situation.
+    /// </summary>
+    public void UpdatePoints()
+    {
+        if (points.Count == 0)
+        {
+            CreatePoint(GPSManager.position, DateTime.Now);
+        }
+        else if (GetDistance(points[points.Count - 1].GetGPSPosition(), GPSManager.position) > 10.0f)
+        {
+            CreatePoint(GPSManager.position, DateTime.Now);
+        }
+    }
+
+    /// <summary>
+    /// Create a new point and add it to the list.
+    /// </summary>
+    /// <param name="GPSposition"></param>
+    /// <param name="dateTime"></param>
+    public void CreatePoint(Vector2 GPSposition, DateTime dateTime)
+    {
+        GPSPoint newPoint = new GPSPoint(GPSposition, dateTime);
+        newPoint.Reposition();
+        if(points.Count > 0)
+        {
+            points[points.Count - 1].SetNext(newPoint);
+        }
+        points.Add(newPoint);
     }
 
     /// <summary>
@@ -106,17 +126,36 @@ public class WorldManager : MonoBehaviour
         FileStream file = File.Create(Application.persistentDataPath + "/gamesave.save");
         bf.Serialize(file, zones);
         file.Close();
+        file = File.Create(Application.persistentDataPath + "/points.save");
+        bf.Serialize(file, points);
+        file.Close();
     }
 
+    /// <summary>
+    /// Load the save files
+    /// </summary>
     private void LoadWorld()
     {
         if(File.Exists(Application.persistentDataPath + "/gamesave.save"))
         {
             print("Loading world");
             BinaryFormatter bf = new BinaryFormatter();
+
+            //Load zones
             FileStream file = File.Open(Application.persistentDataPath + "/gamesave.save", FileMode.Open);
             zones = (Dictionary<ZoneID, ZoneData>)bf.Deserialize(file);
             file.Close();
+
+            //Load points
+            file = File.Open(Application.persistentDataPath + "/points.save", FileMode.Open);
+            List<GPSPoint> tempPoints = (List<GPSPoint>)bf.Deserialize(file);
+            file.Close();
+            foreach (GPSPoint point in tempPoints)
+            {
+                CreatePoint(point.GetGPSPosition(), point.dateTime);
+            }
+
+            RepositionWorld();
         }
     }
 
@@ -234,14 +273,14 @@ public class WorldManager : MonoBehaviour
         int recalcAMount = 1000;
         if (player.transform.position.x >= recalcAMount || player.transform.position.z >= recalcAMount || forceReposition)
         {
-            RepositionZones();
+            RepositionWorld();
         }
 
         //Activate closest highest zone.
         if (closestHigestZone != default)
         {
             zones[closestHigestZone].lineActive = true;
-            zones[closestHigestZone].lineColor = Color.blue;
+            zones[closestHigestZone].lineColor = UnityEngine.Color.blue;
             zones[closestHigestZone].SetActive(true, originZone);
             zones[closestHigestZone].Update(player.transform.position);
         }
@@ -254,13 +293,23 @@ public class WorldManager : MonoBehaviour
     /// <summary>
     /// Repositions the zones around the position of the player.
     /// </summary>
-    private void RepositionZones()
+    private void RepositionWorld()
     {
         Debug.Log("Reposition");
         originZone = playerZone;
         foreach (ZoneData zoneData in zones.Values)
         {
             zoneData.reposition(playerZone, zoneSize);
+        }
+
+        foreach (GPSPoint point in points)
+        {
+            point.Reposition();
+        }
+
+        foreach (GPSPoint point in points)
+        {
+            point.DrawLine();
         }
     }
 
@@ -310,8 +359,6 @@ public class WorldManager : MonoBehaviour
         float percentageY = (GPSPos.y - thisZoneStart.y) / (nextZoneStartY.y - thisZoneStart.y);
         if (percentageY < 0) percentageY = 0;
         if (percentageX < 0) percentageX = 0;
-
-        Debug.Log(GPSPos.x);
 
         float x = (zoneID.x - originZone.x + percentageX - 0.5f) * zoneSize;
         float y = (zoneID.y - originZone.y + percentageY - 0.5f) * zoneSize * -1;

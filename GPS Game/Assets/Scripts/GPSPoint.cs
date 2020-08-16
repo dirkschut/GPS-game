@@ -3,52 +3,71 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class GPSPoint
 {
-    public readonly Vector2 gpsPosition;
+    public readonly float lon;
+    public readonly float lat;
     public readonly DateTime dateTime;
-    private GPSPoint next;
 
     [NonSerialized]
     private GameObject gameObject;
 
-    public GPSPoint(Vector2 gpsPosition, DateTime dateTime, GameObject prefab)
-    {
-        this.gpsPosition = gpsPosition;
-        this.dateTime = dateTime;
-        gameObject = GameObject.Instantiate(prefab, new Vector3(0f, 0f, 0f), Quaternion.identity);
-    }
+    [NonSerialized]
+    private GPSPoint nextPoint;
 
-    public void SetNext(GPSPoint next)
+    public GPSPoint(Vector2 gpsPosition, DateTime dateTime)
     {
-        this.next = next;
-        DrawLine();
+        lon = gpsPosition.x;
+        lat = gpsPosition.y;
+        this.dateTime = dateTime;
+        CreateGameObject();
     }
 
     public void Reposition()
     {
         if (gameObject != null)
         {
-            Vector2 pos = WorldManager.GPSToGameCoords(gpsPosition);
+            Vector2 pos = WorldManager.GPSToGameCoords(new Vector2(lon, lat));
             gameObject.transform.position = new Vector3(pos.x, 0.5f, pos.y);
-            if(next != null)
+            if(nextPoint != null)
             {
                 DrawLine();
             }
         }
     }
 
-    private void DrawLine()
+    public void DrawLine()
     {
-        Debug.LogWarning("DRAWLINE");
-        LineRenderer lineRenderer = gameObject.GetComponent<LineRenderer>();
-        lineRenderer.positionCount = 2;
-        lineRenderer.SetPosition(0, GetGameobjectPosition());
-        lineRenderer.SetPosition(1, next.GetGameobjectPosition());
+        if(gameObject != null && nextPoint != null)
+        {
+            LineRenderer lineRenderer = gameObject.GetComponent<LineRenderer>();
+            lineRenderer.positionCount = 2;
+            lineRenderer.SetPosition(0, GetGameobjectPosition());
+            lineRenderer.SetPosition(1, nextPoint.GetGameobjectPosition());
+        }
     }
 
     public Vector3 GetGameobjectPosition()
     {
         return gameObject.transform.position;
+    }
+
+    public Vector2 GetGPSPosition()
+    {
+        return new Vector2(lon, lat);
+    }
+
+    public void CreateGameObject()
+    {
+        WorldManager worldManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<WorldManager>();
+        gameObject = GameObject.Instantiate(worldManager.pointPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity);
+        Reposition();
+    }
+
+    public void SetNext(GPSPoint nextPoint)
+    {
+        this.nextPoint = nextPoint;
+        DrawLine();
     }
 }
