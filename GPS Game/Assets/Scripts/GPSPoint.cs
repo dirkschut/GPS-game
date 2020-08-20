@@ -9,6 +9,7 @@ public class GPSPoint
     public readonly float lon;
     public readonly float lat;
     public readonly DateTime dateTime;
+    public float actualDistance;
 
     [NonSerialized]
     private GameObject gameObject;
@@ -69,5 +70,10 @@ public class GPSPoint
     {
         this.nextPoint = nextPoint;
         DrawLine();
+    }
+
+    public void DestroyGameObject()
+    {
+        GameObject.Destroy(gameObject);
     }
 }

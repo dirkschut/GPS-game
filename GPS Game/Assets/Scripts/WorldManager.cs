@@ -92,11 +92,11 @@ public class WorldManager : MonoBehaviour
     {
         if (points.Count == 0)
         {
-            CreatePoint(GPSManager.position, DateTime.Now);
+            CreatePoint(GPSManager.position, DateTime.Now, -1f);
         }
         else if (GetDistance(points[points.Count - 1].GetGPSPosition(), GPSManager.position) > 10.0f)
         {
-            CreatePoint(GPSManager.position, DateTime.Now);
+            CreatePoint(GPSManager.position, DateTime.Now, -1f);
         }
     }
 
@@ -105,15 +105,48 @@ public class WorldManager : MonoBehaviour
     /// </summary>
     /// <param name="GPSposition"></param>
     /// <param name="dateTime"></param>
-    public void CreatePoint(Vector2 GPSposition, DateTime dateTime)
+    public void CreatePoint(Vector2 GPSposition, DateTime dateTime, float actualDistance)
     {
         GPSPoint newPoint = new GPSPoint(GPSposition, dateTime);
         newPoint.Reposition();
+
         if(points.Count > 0)
         {
+            if (actualDistance == -1f)
+            {
+                newPoint.actualDistance = GetDistance(newPoint.GetGPSPosition(), points[points.Count - 1].GetGPSPosition());
+            }
+            else
+            {
+                newPoint.actualDistance = actualDistance;
+            }
             points[points.Count - 1].SetNext(newPoint);
         }
         points.Add(newPoint);
+        TrunkatePoints();
+    }
+
+    /// <summary>
+    /// Checks to see if the last two points can be combined into one.
+    /// </summary>
+    private void TrunkatePoints()
+    {
+        if(points.Count >= 3)
+        {
+            float totalActualDistance = points[points.Count - 1].actualDistance + points[points.Count - 2].actualDistance;
+            if(totalActualDistance <= 100f)
+            {
+                float onMapDistance = GetDistance(points[points.Count - 3].GetGPSPosition(), points[points.Count - 1].GetGPSPosition());
+                if(onMapDistance <= totalActualDistance && onMapDistance >= totalActualDistance * 0.95f)
+                {
+                    points[points.Count - 3].SetNext(points[points.Count - 1]);
+                    points[points.Count - 1].actualDistance = totalActualDistance;
+                    points[points.Count - 3].DrawLine();
+                    points[points.Count - 2].DestroyGameObject();
+                    points.RemoveAt(points.Count - 2);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -152,7 +185,7 @@ public class WorldManager : MonoBehaviour
             file.Close();
             foreach (GPSPoint point in tempPoints)
             {
-                CreatePoint(point.GetGPSPosition(), point.dateTime);
+                CreatePoint(point.GetGPSPosition(), point.dateTime, point.actualDistance);
             }
 
             RepositionWorld();
