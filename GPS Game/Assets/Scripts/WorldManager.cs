@@ -34,6 +34,9 @@ public class WorldManager : MonoBehaviour
     private Dictionary<ZoneID, ZoneData> zones = new Dictionary<ZoneID, ZoneData>();
     private List<GPSPoint> points = new List<GPSPoint>();
 
+    public static int Distance = 0;
+    public static DateTime LastDistanceCalc = DateTime.Now;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -448,5 +451,30 @@ public class WorldManager : MonoBehaviour
         var d3 = Mathf.Pow(Mathf.Sin((d2 - d1) / 2.0f), 2.0f) + Mathf.Cos(d1) * Mathf.Cos(d2) * Mathf.Pow(Mathf.Sin(num2 / 2.0f), 2.0f);
 
         return 6376500.0f * (2.0f * Mathf.Atan2(Mathf.Sqrt(d3), Mathf.Sqrt(1.0f - d3)));
+    }
+
+    /// <summary>
+    /// Calculate the total distance traveled today
+    /// </summary>
+    /// <returns>distance in meters</returns>
+    public static int GetDistanceToday()
+    {
+        if(LastDistanceCalc.AddSeconds(10) > DateTime.Now)
+        {
+            return Distance;
+        }
+
+        WorldManager worldManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<WorldManager>();
+
+        float tempDistance = 0f;
+
+        foreach (GPSPoint point in worldManager.points)
+        {
+            tempDistance += point.actualDistance;
+        }
+
+        Distance = Mathf.FloorToInt(tempDistance);
+        LastDistanceCalc = DateTime.Now;
+        return Distance;
     }
 }
