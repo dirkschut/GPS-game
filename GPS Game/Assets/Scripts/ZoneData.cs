@@ -143,6 +143,7 @@ public class ZoneData
         WorldManager worldManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<WorldManager>();
         Vector3 zoneLocation = new Vector3(zoneID.x * WorldManager.zoneSize, -0.05f, -1 * zoneID.y * WorldManager.zoneSize);
         GameObject tempGameObject = GameObject.Instantiate(worldManager.zonePrefab, zoneLocation, Quaternion.identity);
+        tempGameObject.transform.Rotate(new Vector3(90, 180 , 0));
         tempGameObject.GetComponent<ZoneIDGetter>().ZoneID = zoneID;
         return tempGameObject;
     }
