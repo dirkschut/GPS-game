@@ -186,12 +186,25 @@ public class WorldManager : MonoBehaviour
             file = File.Open(Application.persistentDataPath + "/points.save", FileMode.Open);
             List<GPSPoint> tempPoints = (List<GPSPoint>)bf.Deserialize(file);
             file.Close();
-            foreach (GPSPoint point in tempPoints)
-            {
-                CreatePoint(point.GetGPSPosition(), point.dateTime, point.actualDistance);
-            }
+            LoadPoints(tempPoints);
 
             RepositionWorld();
+        }
+    }
+
+    /// <summary>
+    /// Load a given list of points into the game.
+    /// </summary>
+    /// <param name="inputPoints">the given list of points</param>
+    private void LoadPoints(List<GPSPoint> inputPoints)
+    {
+        foreach (GPSPoint point in inputPoints)
+        {
+            CreatePoint(point.GetGPSPosition(), point.dateTime, point.actualDistance);
+            if(point.dateTime.Date != DateTime.Today)
+            {
+                points[points.Count - 1].DestroyGameObject();
+            }
         }
     }
 
@@ -470,7 +483,10 @@ public class WorldManager : MonoBehaviour
 
         foreach (GPSPoint point in worldManager.points)
         {
-            tempDistance += point.actualDistance;
+            if (point.HasGameObject())
+            {
+                tempDistance += point.actualDistance;
+            }
         }
 
         Distance = Mathf.FloorToInt(tempDistance);

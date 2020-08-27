@@ -75,5 +75,15 @@ public class GPSPoint
     public void DestroyGameObject()
     {
         GameObject.Destroy(gameObject);
+        gameObject = null;
+    }
+
+    public bool HasGameObject()
+    {
+        if(gameObject != null)
+        {
+            return true;
+        }
+        return false;
     }
 }
