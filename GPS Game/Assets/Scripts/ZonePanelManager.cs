@@ -11,6 +11,7 @@ public class ZonePanelManager : MonoBehaviour
     public TMPro.TextMeshProUGUI coordinatesLabel;
     public TMPro.TextMeshProUGUI pointsLabel;
     public TMPro.TextMeshProUGUI labelsLabel;
+    public TMPro.TextMeshProUGUI nextVisitLabel;
     
     public void OpenZoneID(ZoneID zoneID)
     {
@@ -31,5 +32,6 @@ public class ZonePanelManager : MonoBehaviour
         nameLabel.text = "Name: " + zoneID.ToString();
         coordinatesLabel.text = "Coords: lat: " + WorldManager.tiley2lat(zoneID.y, WorldManager.zoomLevel) + ", long: " + WorldManager.tilex2long(zoneID.x, WorldManager.zoomLevel);
         pointsLabel.text = "Points: " + zoneID.GetZoneData().points;
+        nextVisitLabel.text = "Next Visit: " + zoneID.GetZoneData().nextVisit;
     }
 }
