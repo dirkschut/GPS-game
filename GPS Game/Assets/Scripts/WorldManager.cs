@@ -37,6 +37,8 @@ public class WorldManager : MonoBehaviour
     public static int Distance = 0;
     public static DateTime LastDistanceCalc = DateTime.Now;
 
+    public static int MaxZones = 500;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -100,6 +102,19 @@ public class WorldManager : MonoBehaviour
         else if (GetDistance(points[points.Count - 1].GetGPSPosition(), GPSManager.position) > 10.0f)
         {
             CreatePoint(GPSManager.position, DateTime.Now, -1f);
+        }
+    }
+
+    /// <summary>
+    /// Set the maximum number of zones to be rendered
+    /// </summary>
+    /// <param name="amount">The maximum amount</param>
+    public void SetMaxZones(int amount)
+    {
+        if(amount > 0 && amount <= 1000)
+        {
+            MaxZones = amount;
+            EnterZone(playerZone, true);
         }
     }
 
@@ -273,7 +288,6 @@ public class WorldManager : MonoBehaviour
         int lineCount = 0;
         int maxLines = 4;
         int zoneCount = 0;
-        int maxZones = 500;
         float closestHighestMaxDistance = 20f;
         ZoneID closestHigestZone = default;
         int closestHigestScore = 0;
@@ -296,7 +310,7 @@ public class WorldManager : MonoBehaviour
                 closestHigestZone = zone.Key;
             }
 
-            if(zoneCount < maxZones || lineCount < maxLines)
+            if(zoneCount < MaxZones || lineCount < maxLines)
             {
                 zoneCount++;
                 zone.Value.SetActive(true, originZone);
