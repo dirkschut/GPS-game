@@ -57,9 +57,11 @@ public class Texturer : MonoBehaviour
     /// <param name="path">The path to the texture</param>
     public void SetTextureFromFile(string path)
     {
+        print("Loading Image: " + path);
         byte[] fileData = File.ReadAllBytes(path);
         Texture2D texture = new Texture2D(256, 256);
         texture.LoadImage(fileData);
+        print(GetComponent<Renderer>());
         GetComponent<Renderer>().material.mainTexture = texture;
     }
 }
